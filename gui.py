@@ -1,4 +1,5 @@
 # move all calculation logic to the backend
+import backend 
 import tkinter as tk
 from tkinter import ttk, filedialog
 import sv_ttk
@@ -505,7 +506,7 @@ class Page3(ttk.Frame):
             bottom_bar,
             text="Calculate",
             width=14,
-            command=self.calculate
+            command=self.run_calculation
         ).grid(row=0, column=2, padx=(0, 10))
 
         ttk.Button(
@@ -527,11 +528,11 @@ class Page3(ttk.Frame):
         for row in demo_rows:
             self.table.insert("", "end", values=row)
 
-    def calculate(self):
+    def run_calculation(self):
         self.table.delete(*self.table.get_children())
 
         try:
-            self.results = run_calculation(self.app)
+            self.results = backend.calculate(self.app)
 
             if not self.results:
                 self.status_text.set("No calculation data produced")
@@ -571,48 +572,6 @@ class Page3(ttk.Frame):
 
 
 app = App()
-
-
-def run_calculation(app):
-    axle_distance = app.axle_distance.get()
-    post = Post(app.post_hea.get(), app.post_height.get())
-    # akustik = Akustik(app.akustik_.get)
-    plaka = Plaka(app.plaka_width.get(), app.plaka_height.get(), app.plaka_thickness.get())
-    berkitme = Berkitme(app.berkitme_width.get(), app.berkitme_height.get(), app.berkitme_thickness.get())
-    # pclevha = PcLevha()
-    # stiffener = Stiffener
-    bolt = Civata(app.bolt_size.get(), app.isStud.get())
-        
-
-
-
-    rows = [
-        {"Parameter": "Axle Distance", "Value": axle_distance, "Unit": "mm"},
-
-        {"Parameter": "Post Type", "Value": post.HEA, "Unit": "-"},
-        {"Parameter": "Post Height", "Value": post.height_mm, "Unit": "mm"},
-        {"Parameter": "Post Mass", "Value": round(post.mass_kg, 2), "Unit": "kg"},
-
-        {"Parameter": "Plate Width", "Value": plaka.width_mm, "Unit": "mm"},
-        {"Parameter": "Plate Height", "Value": plaka.height_mm, "Unit": "mm"},
-        {"Parameter": "Plate Thickness", "Value": plaka.thickness_mm, "Unit": "mm"},
-
-        {"Parameter": "Berkitme Width", "Value": berkitme.width_mm, "Unit": "mm"},
-        {"Parameter": "Berkitme Height", "Value": berkitme.height_mm, "Unit": "mm"},
-        {"Parameter": "Berkitme Thickness", "Value": berkitme.thickness_mm, "Unit": "mm"},
-
-        {"Parameter": "Bolt Mass", "Value": bolt.mass_kg, "Unit": "kg"},
-        {"Parameter": "Bolt Mass", "Value": bolt.isStud, "Unit": "-"}
-
-
-
-
-
-
-    
-    ]
-
-    return rows
 
 
 if __name__ == "__main__":
