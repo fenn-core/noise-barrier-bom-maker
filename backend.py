@@ -29,7 +29,6 @@ class Post:
         density = self.HEA_density_kg_per_mm[HEA]
         self.mass_kg = self.height_mm * density * GALVANIZATION_FACTOR 
 
-
 class Akustik: 
     density_kg_per_m2 = 18  
     height_mm = 500
@@ -40,7 +39,6 @@ class Akustik:
         self.length_mm = length_mm
         self.area_m2 = length_mm * self.height_mm * 1e-6  # mm2 to m2 conversion
         self.mass_kg =  self.area_m2 * self.density_kg_per_m2 
-
 
 class Plaka: 
     def __init__(self, width_mm, height_mm, thickness_mm):
@@ -117,7 +115,7 @@ class Civata: # 4 per plate each accompanied by a nut and a washer
     # m16 - m24 x 250 mass cost amount etc 
     # isStud or isBolt same measurements for all and same M washers to add 2 mm 
 
-def calculate():
+def calculate(parts):
     
 
 
@@ -129,43 +127,3 @@ def calculate():
 
 
 
-# def run_calculation(app):
-#     axle_distance = app.axle_distance.get()
-#     post = backend.Post(app.post_hea.get(), app.post_height.get())
-#     # akustik = Akustik(app.akustik_.get)
-#     plaka = backend.Plaka(app.plaka_width.get(), app.plaka_height.get(), app.plaka_thickness.get())
-#     berkitme = backend.Berkitme(app.berkitme_width.get(), app.berkitme_height.get(), app.berkitme_thickness.get())
-#     # pclevha = PcLevha()
-#     # stiffener = Stiffener
-#     bolt = backend.Civata(app.bolt_size.get(), app.isStud.get())
-        
-
-
-
-#     rows = [
-#         {"Parameter": "Axle Distance", "Value": axle_distance, "Unit": "mm"},
-
-#         {"Parameter": "Post Type", "Value": post.HEA, "Unit": "-"},
-#         {"Parameter": "Post Height", "Value": post.height_mm, "Unit": "mm"},
-#         {"Parameter": "Post Mass", "Value": round(post.mass_kg, 2), "Unit": "kg"},
-
-#         {"Parameter": "Plate Width", "Value": plaka.width_mm, "Unit": "mm"},
-#         {"Parameter": "Plate Height", "Value": plaka.height_mm, "Unit": "mm"},
-#         {"Parameter": "Plate Thickness", "Value": plaka.thickness_mm, "Unit": "mm"},
-
-#         {"Parameter": "Berkitme Width", "Value": berkitme.width_mm, "Unit": "mm"},
-#         {"Parameter": "Berkitme Height", "Value": berkitme.height_mm, "Unit": "mm"},
-#         {"Parameter": "Berkitme Thickness", "Value": berkitme.thickness_mm, "Unit": "mm"},
-
-#         {"Parameter": "Bolt Mass", "Value": bolt.mass_kg, "Unit": "kg"},
-#         {"Parameter": "Bolt Mass", "Value": bolt.isStud, "Unit": "-"}
-
-
-
-
-
-
-
-#     ]
-
-#     return rows

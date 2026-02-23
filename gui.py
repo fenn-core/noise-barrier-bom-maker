@@ -19,25 +19,24 @@ class App(tk.Tk):
         self.container = ttk.Frame(self)
         self.container.pack(fill="both", expand=True)
 
-        self.axle_distance = tk.IntVar(value=0)
+        self.axle_distance_m = tk.IntVar(value=0)
         self.is_dual = tk.BooleanVar(value=False)
 
         self.post_hea = tk.StringVar(value="HEA120")
-        self.post_height = tk.IntVar(value=0)
+        self.post_height_mm = tk.IntVar(value=0)
 
-        self.plaka_width = tk.IntVar(value=0)
-        self.plaka_height = tk.IntVar(value=0)
-        self.plaka_thickness = tk.IntVar(value=0)
+        self.plaka_width_mm = tk.IntVar(value=0)
+        self.plaka_height_mm = tk.IntVar(value=0)
+        self.plaka_thickness_mm = tk.IntVar(value=0)
 
-        self.berkitme_width = tk.IntVar(value=0)
-        self.berkitme_height = tk.IntVar(value=0)
-        self.berkitme_thickness = tk.IntVar(value=0)
+        self.berkitme_width_mm = tk.IntVar(value=0)
+        self.berkitme_height_mm = tk.IntVar(value=0)
+        self.berkitme_thickness_mm = tk.IntVar(value=0)
 
-        self.pc_thickness = tk.StringVar(value="12mm")
+        self.pc_thickness_mm = tk.StringVar(value="12mm")
 
-        self.bolt_size = tk.StringVar(value="M16")
+        self.M_size = tk.StringVar(value="M16")
         self.isStud = tk.BooleanVar(value=False)
-
 
         self.pages = {}
         for Page in (Page1, Page2,Page3):
@@ -48,10 +47,21 @@ class App(tk.Tk):
         self.show(Page1)
 
     def show(self, page):
-        self.pages[page].tkraise()
-
+        frame = self.pages[page]
+        frame.tkraise()
+        if hasattr(frame, "_draw_model"):
+            frame._draw_model()
+            
     def theme_switch(self):
         sv_ttk.set_theme("dark" if self.dark_mode.get() else "light")
+
+    def get_data(self):
+        
+
+        
+
+
+        pass
 
 
 class Page1(ttk.Frame):
@@ -63,7 +73,6 @@ class Page1(ttk.Frame):
         PAD_Y = 12
         ENTRY_W = 12
         COMBO_W = 12
-
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=0)
@@ -94,7 +103,7 @@ class Page1(ttk.Frame):
         axle_frame.grid(row=0, column=0, sticky="w", padx=(0, 20))
 
         ttk.Label(axle_frame, text="Axle Distance (mm):").grid(row=0, column=0, sticky="w")
-        ttk.Entry(axle_frame, textvariable=app.axle_distance, width=ENTRY_W).grid(row=0, column=1)
+        ttk.Entry(axle_frame, textvariable=app.axle_distance_m, width=ENTRY_W).grid(row=0, column=1)
 
         dual_frame = ttk.LabelFrame(row_frame, text="Çift", padding=10)
         dual_frame.grid(row=0, column=1, sticky="w")
@@ -119,7 +128,7 @@ class Page1(ttk.Frame):
         ).grid(row=0, column=1, padx=(0, 12))
 
         ttk.Label(post_frame, text="Height (mm):").grid(row=0, column=2, sticky="w")
-        ttk.Entry(post_frame, textvariable=app.post_height, width=ENTRY_W).grid(row=0, column=3)
+        ttk.Entry(post_frame, textvariable=app.post_height_mm, width=ENTRY_W).grid(row=0, column=3)
 
         def dim_row(frame, items):
             for i, (label, var) in enumerate(items):
@@ -129,17 +138,17 @@ class Page1(ttk.Frame):
         plaka_frame = ttk.LabelFrame(self, text="Plaka", padding=10)
         plaka_frame.grid(row=4, column=0, sticky="w", padx=PAD_X, pady=PAD_Y)
         dim_row(plaka_frame, [
-            ("Width (mm):", app.plaka_width),
-            ("Height (mm):", app.plaka_height),
-            ("Thickness (mm):", app.plaka_thickness),
+            ("Width (mm):", app.plaka_width_mm),
+            ("Height (mm):", app.plaka_height_mm),
+            ("Thickness (mm):", app.plaka_thickness_mm),
         ])
 
         berkitme_frame = ttk.LabelFrame(self, text="Berkitme", padding=10)
         berkitme_frame.grid(row=5, column=0, sticky="w", padx=PAD_X, pady=PAD_Y)
         dim_row(berkitme_frame, [
-            ("Width (mm):", app.berkitme_width),
-            ("Height (mm):", app.berkitme_height),
-            ("Thickness (mm):", app.berkitme_thickness),
+            ("Width (mm):", app.berkitme_width_mm),
+            ("Height (mm):", app.berkitme_height_mm),
+            ("Thickness (mm):", app.berkitme_thickness_mm),
         ])
 
         pc_frame = ttk.LabelFrame(self, text="PC Levha", padding=10)
@@ -148,7 +157,7 @@ class Page1(ttk.Frame):
         ttk.Label(pc_frame, text="Thickness:").grid(row=0, column=0, sticky="w")
         ttk.Combobox(
             pc_frame,
-            textvariable=app.pc_thickness,
+            textvariable=app.pc_thickness_mm,
             values=["12mm", "14mm", "16mm", "20mm", "22mm"],
             state="readonly",
             width=COMBO_W
@@ -160,7 +169,7 @@ class Page1(ttk.Frame):
         ttk.Label(bolt_frame, text="Bolt Size:").grid(row=0, column=0, sticky="w")
         ttk.Combobox(
             bolt_frame,
-            textvariable=app.bolt_size,
+            textvariable=app.M_size,
             values=["M16", "M18", "M20", "M22", "M24"],
             state="readonly",
             width=COMBO_W
@@ -177,20 +186,15 @@ class Page1(ttk.Frame):
             command=lambda: app.show(Page2)
         ).grid(row=9, column=0, sticky="e", padx=PAD_X, pady=20)
 
-
-
 class Page2(ttk.Frame):
     def __init__(self, parent, app):
         super().__init__(parent)
         self.app = app
-
         PAD_X = 20
         PAD_Y = 12
-
-        self.post_height_m = 4
         self.pc_panel_height_m = 1.0
         self.acoustic_panel_height_m = 0.5
-
+        
         self.acoustic_count = tk.IntVar(value=0)
         self.pc_count = tk.IntVar(value=0)
 
@@ -282,7 +286,8 @@ class Page2(ttk.Frame):
         )
 
     def _remaining_height(self):
-        return self.post_height_m - self._used_height()
+        post_height_m = self.app.post_height_mm.get() / 1000
+        return post_height_m - self._used_height()
 
     def _add_acoustic(self):
         if self._remaining_height() >= self.acoustic_panel_height_m:
@@ -315,7 +320,8 @@ class Page2(ttk.Frame):
         bottom_margin = 30
 
         usable_h = canvas_h - top_margin - bottom_margin
-        scale = usable_h / self.post_height_m
+        post_height_mm = self.app.post_height_mm.get()
+        scale = usable_h / ((post_height_mm + 1e-6) / 1000)
 
         model_width = canvas_w * 0.55
         x_center = canvas_w / 2
@@ -327,7 +333,9 @@ class Page2(ttk.Frame):
         panel_inset = post_width * 0.6
 
         y_bottom = canvas_h - bottom_margin
-        y_top = y_bottom - self.post_height_m * scale
+        post_height_m = post_height_mm / 1000
+        scale = usable_h / (post_height_m + 1e-6)
+        y_top = y_bottom - post_height_m * scale
 
         steel_fill = "#6f7276"
         steel_edge = "#5a5d61"
@@ -346,7 +354,7 @@ class Page2(ttk.Frame):
         )
 
         h = 0.0
-        while h <= self.post_height_m + 1e-6:
+        while h <= post_height_mm/1000 + 1e-6:
             y = y_bottom - h * scale
             if abs(h % 1.0) < 1e-6:
                 self.canvas.create_line(
@@ -416,8 +424,6 @@ class Page2(ttk.Frame):
             fill="#444",
             width=1
         )
-    
-
 
 class Page3(ttk.Frame):
     def __init__(self, parent, app):
@@ -576,3 +582,45 @@ app = App()
 
 if __name__ == "__main__":
     app.mainloop()
+
+
+# def run_calculation(app):
+#     axle_distance = app.axle_distance.get()
+#     post = backend.Post(app.post_hea.get(), app.post_height.get())
+#     # akustik = Akustik(app.akustik_.get)
+#     plaka = backend.Plaka(app.plaka_width.get(), app.plaka_height.get(), app.plaka_thickness.get())
+#     berkitme = backend.Berkitme(app.berkitme_width.get(), app.berkitme_height.get(), app.berkitme_thickness.get())
+#     # pclevha = PcLevha()
+#     # stiffener = Stiffener
+#     bolt = backend.Civata(app.bolt_size.get(), app.isStud.get())
+        
+
+
+
+#     rows = [
+#         {"Parameter": "Axle Distance", "Value": axle_distance, "Unit": "mm"},
+
+#         {"Parameter": "Post Type", "Value": post.HEA, "Unit": "-"},
+#         {"Parameter": "Post Height", "Value": post.height_mm, "Unit": "mm"},
+#         {"Parameter": "Post Mass", "Value": round(post.mass_kg, 2), "Unit": "kg"},
+
+#         {"Parameter": "Plate Width", "Value": plaka.width_mm, "Unit": "mm"},
+#         {"Parameter": "Plate Height", "Value": plaka.height_mm, "Unit": "mm"},
+#         {"Parameter": "Plate Thickness", "Value": plaka.thickness_mm, "Unit": "mm"},
+
+#         {"Parameter": "Berkitme Width", "Value": berkitme.width_mm, "Unit": "mm"},
+#         {"Parameter": "Berkitme Height", "Value": berkitme.height_mm, "Unit": "mm"},
+#         {"Parameter": "Berkitme Thickness", "Value": berkitme.thickness_mm, "Unit": "mm"},
+
+#         {"Parameter": "Bolt Mass", "Value": bolt.mass_kg, "Unit": "kg"},
+#         {"Parameter": "Bolt Mass", "Value": bolt.isStud, "Unit": "-"}
+
+
+
+
+
+
+
+#     ]
+
+#     return rows
