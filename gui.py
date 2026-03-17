@@ -19,7 +19,8 @@ class App(tk.Tk):
         self.container = ttk.Frame(self)
         self.container.pack(fill="both", expand=True)
 
-        self.axle_distance_m = tk.IntVar(value=0)
+        self.full_distance_m = tk.DoubleVar(value=0.0)
+        self.axle_distance_mm = tk.IntVar(value=0)
         self.is_dual = tk.BooleanVar(value=False)
 
         self.post_hea = tk.StringVar(value="HEA120")
@@ -56,12 +57,25 @@ class App(tk.Tk):
         sv_ttk.set_theme("dark" if self.dark_mode.get() else "light")
 
     def get_data(self):
-        
-
-        
-
-
-        pass
+        page2 = self.pages[Page2]
+        return {
+            "full_distance_m": self.full_distance_m.get(),
+            "axle_distance_mm": self.axle_distance_mm.get(),
+            "is_dual": self.is_dual.get(),
+            "post_hea": self.post_hea.get(),
+            "post_height_mm": self.post_height_mm.get(),
+            "plaka_width_mm": self.plaka_width_mm.get(),
+            "plaka_height_mm": self.plaka_height_mm.get(),
+            "plaka_thickness_mm": self.plaka_thickness_mm.get(),
+            "berkitme_width_mm": self.berkitme_width_mm.get(),
+            "berkitme_height_mm": self.berkitme_height_mm.get(),
+            "berkitme_thickness_mm": self.berkitme_thickness_mm.get(),
+            "pc_thickness_mm": self.pc_thickness_mm.get(),
+            "M_size": self.M_size.get(),
+            "isStud": self.isStud.get(),
+            "acoustic_count": page2.acoustic_count.get(),
+            "pc_count": page2.pc_count.get(),
+        }
 
 
 class Page1(ttk.Frame):
@@ -102,8 +116,11 @@ class Page1(ttk.Frame):
         axle_frame = ttk.LabelFrame(row_frame, text="Axle", padding=10)
         axle_frame.grid(row=0, column=0, sticky="w", padx=(0, 20))
 
-        ttk.Label(axle_frame, text="Axle Distance (mm):").grid(row=0, column=0, sticky="w")
-        ttk.Entry(axle_frame, textvariable=app.axle_distance_m, width=ENTRY_W).grid(row=0, column=1)
+        ttk.Label(axle_frame, text="Full Distance (m):").grid(row=0, column=0, sticky="w")
+        ttk.Entry(axle_frame, textvariable=app.full_distance_m, width=ENTRY_W).grid(row=0, column=1, padx=(0, 12))
+
+        ttk.Label(axle_frame, text="Axle Distance (mm):").grid(row=0, column=2, sticky="w")
+        ttk.Entry(axle_frame, textvariable=app.axle_distance_mm, width=ENTRY_W).grid(row=0, column=3)
 
         dual_frame = ttk.LabelFrame(row_frame, text="Çift", padding=10)
         dual_frame.grid(row=0, column=1, sticky="w")
@@ -481,7 +498,7 @@ class Page3(ttk.Frame):
         self.table.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        self.populate_demo_data()
+        self.status_text.set("Press Calculate to generate results")
 
         ttk.Separator(self).grid(row=3, column=0, sticky="ew", padx=PAD_X)
 
@@ -522,23 +539,11 @@ class Page3(ttk.Frame):
             command=self.select_save_location
         ).grid(row=0, column=3)
 
-    def populate_demo_data(self):
-        demo_rows = [
-            ("Aks Mesafesi ", 0, "mm"),
-            ("Post Yukseligi", 3000, "mm"),
-            ("Bolt Diameter", 16, "mm"),
-            ("Plate Thickness", 12, "mm"),
-            ("Safety Factor", 1.65, "-"),
-        ]
-
-        for row in demo_rows:
-            self.table.insert("", "end", values=row)
-
     def run_calculation(self):
         self.table.delete(*self.table.get_children())
 
         try:
-            self.results = backend.calculate(self.app)
+            self.results = backend.calculate(self.app.get_data())
 
             if not self.results:
                 self.status_text.set("No calculation data produced")
@@ -560,7 +565,7 @@ class Page3(ttk.Frame):
 
     def select_save_location(self):
         if not self.results:
-            print("Nothing to save yet")
+            self.status_text.set("Nothing to save yet")
             return
 
         path = filedialog.asksaveasfilename(
@@ -574,7 +579,7 @@ class Page3(ttk.Frame):
         df = pd.DataFrame(self.results)
         df.to_excel(path, index=False)
 
-        print(f"Saved to {path}")
+        self.status_text.set(f"Saved to {path}")
 
 
 app = App()
